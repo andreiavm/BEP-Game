@@ -1,0 +1,139 @@
+import ddf.minim.*;
+Minim minim;
+AudioPlayer chew;
+AudioPlayer song;
+AudioPlayer fail;
+AudioPlayer choir;
+// use left and right to move, and press S to shoot.
+
+//variable for player shapes
+float playerX = 350;
+float playerY = 590;
+
+//variable for score
+int countScore = 0;
+
+//variables for enemy position
+float snakeX = 300;
+float snakeY = -200;
+
+//variables for mushroom position
+float mushroomX = -300;
+float mushroomY = 0;
+
+//booleans to make the enemy move up and to make them stop
+boolean moveDown = true;
+boolean moveUp = false;
+
+PFont font;
+PImage snake;
+PImage mushroom;
+PImage grass;
+PFont edo;
+
+void setup() {
+  size(800, 600);
+  grass = loadImage("grass.png");
+  background(grass);
+  snake = loadImage ("snake.png");
+  mushroom = loadImage ("mushroom.png");
+  minim = new Minim(this);
+  chew = minim.loadFile("chew.mp3");
+  song = minim.loadFile("song.mp3");
+  fail = minim.loadFile("fail.mp3");
+  choir = minim.loadFile("choir.mp3");
+  edo = createFont("edo.ttf", 40);
+}
+
+void draw() {
+  // Refresh Background
+  background(grass);
+  // Draw Score Text
+  fill(255);
+  textFont(edo);
+  text("Score: " + countScore, 15, 45);
+  textSize(40);
+
+  //Draw Enemy
+  image(snake, snakeX, snakeY, 100, 100); 
+
+  // Draw Mushroom
+  image(mushroom, mushroomX, mushroomY, 100, 100);
+
+  //Player
+  fill(224, 38, 66);
+  rect(playerX, playerY, 100, 5);
+  
+  // Play Background Music
+  song.play();
+  
+  
+
+  //if statement to move the player and the bullets with left and right key
+  if (keyPressed == true && key == CODED && keyCode == LEFT) {
+    playerX = playerX - 10;
+  }
+  if (keyPressed == true && key == CODED && keyCode == RIGHT) {
+    playerX = playerX + 10;
+  }
+
+  if (moveDown == true) {
+    // make enemy and mushroom speed random
+    int snakeSpeed = int(random(5, 8));
+    snakeY = snakeY +snakeSpeed;
+    int mushroomSpeed = int(random(5, 8));
+    mushroomY = mushroomY + mushroomSpeed;
+  }
+
+  if (snakeY > 800) {
+    snakeY = -600;  
+    snakeX = int(random(50, 650));
+    moveDown = true;
+  }
+
+  if (mushroomY > 800) {
+    mushroomY = -400;
+    mushroomX = int(random(20, 600));
+    moveDown = true;
+  }
+  
+  
+  if (mushroomX >= playerX -20 && mushroomX <= playerX + 30 && mushroomY >= 560 && mushroomY <=650) {
+    mushroomY = -400;
+    mushroomX = random(50, 760);
+    moveDown = true;
+    countScore = countScore + 1;
+    chew.play();
+    chew.rewind();
+  }
+
+  if (snakeX >= playerX -20 && snakeX <= playerX + 30 && snakeY >= 560 && snakeY <=650) {
+    moveDown = false;
+    background(0,0,0);
+    text ("STUPID MONKEY!", 225,250);
+    countScore = 0;
+    song.mute();
+    fail.play();
+    
+  }
+  
+  if (countScore == 5) {
+    moveDown = false;
+    song.mute();
+    background(0,0,0);
+    text ("YOU HAVE BECOME GOD", 150,250);
+    choir.play();
+
+  }
+  
+    if (keyPressed && key == 's') {
+    countScore = 0;
+    moveDown = true;
+    mushroomX = -100;
+    snakeX = -200;
+    song.rewind();
+    song.unmute();
+    fail.mute();
+    choir.mute();
+    }
+}
